@@ -1,0 +1,120 @@
+Table transactions {
+    _id              varchar [pk]
+    hash             varchar [not null]
+    from_address     varchar [not null, ref: > wallets.address]
+    to_address       varchar [not null, ref: > wallets.address]
+    value            numeric
+    block_timestamp  timestamp
+    block_number     int
+    receipt_status   int
+}
+
+Table dex_swap_events {
+    _id                 varchar [pk]
+    transaction_hash    varchar [not null, ref: > transactions.hash]
+    block_number        int
+    block_timestamp     timestamp
+    contract_address    varchar
+    event_type          varchar
+    log_index           int
+    wallet              varchar [ref: > wallets.address]
+    sender              varchar [ref: > wallets.address]
+    to_address          varchar [ref: > wallets.address]
+    amount0In           numeric
+    amount0Out          numeric
+    amount1In           numeric
+    amount1Out          numeric
+    amount0             numeric
+    amount1             numeric
+    tick                varchar
+    sqrtPriceX96        varchar
+    liquidity           numeric
+    protocolFeesToken0  numeric
+    protocolFeesToken1  numeric
+    tokenIn             varchar
+    tokenOut            varchar
+    amountIn            numeric
+    amountOut           numeric
+    poolId              varchar
+}
+
+Table dex_mint_events {
+    _id                 varchar [pk]
+    transaction_hash    varchar [not null, ref: > transactions.hash]
+    block_number        int
+    block_timestamp     timestamp
+    contract_address    varchar
+    event_type          varchar
+    log_index           int
+    wallet              varchar [ref: > wallets.address]
+    value               numeric
+    index               int
+    balanceIncrease     numeric
+    onBehalfOf          varchar [ref: > wallets.address]
+    caller              varchar [ref: > wallets.address]
+    sender              varchar [ref: > wallets.address]
+    amount0             numeric
+    amount1             numeric
+    mintTokens          numeric
+    mintAmount          numeric
+    minter              varchar [ref: > wallets.address]
+    amount              numeric
+    owner               varchar [ref: > wallets.address]
+    tickLower           varchar
+    tickUpper           varchar
+}
+
+Table dex_burn_events {
+    _id                 varchar [pk]
+    transaction_hash    varchar [not null, ref: > transactions.hash]
+    block_number        int
+    block_timestamp     timestamp
+    contract_address    varchar
+    event_type          varchar
+    log_index           int
+    wallet              varchar [ref: > wallets.address]
+    from_address        varchar [ref: > wallets.address]
+    to_address          varchar [ref: > wallets.address]
+    index               int
+    target              varchar [ref: > wallets.address]
+    value               numeric
+    balanceIncrease     numeric
+    sender              varchar [ref: > wallets.address]
+    amount0             numeric
+    amount1             numeric
+}
+
+Table wallets {
+    _id                      varchar [pk]
+    address                  varchar [not null, unique]
+    chainId                  varchar [not null]
+    balanceInUSD             numeric
+    tokens                   jsonb
+    tokenChangeLogs          jsonb
+    depositInUSD             numeric
+    depositTokens            jsonb
+    borrowInUSD              numeric
+    borrowTokens             jsonb
+    dailyAllTransactions     jsonb
+    dailyTransactionAmounts  jsonb
+    numberOfLiquidation      int
+    totalValueOfLiquidation  numeric
+    flagged                  int [not null]
+}
+
+Ref: transactions.from_address > wallets.address
+Ref: transactions.to_address > wallets.address
+Ref: dex_swap_events.wallet > wallets.address
+Ref: dex_swap_events.sender > wallets.address
+Ref: dex_swap_events.to_address > wallets.address
+Ref: dex_mint_events.wallet > wallets.address
+Ref: dex_mint_events.onBehalfOf > wallets.address
+Ref: dex_mint_events.caller > wallets.address
+Ref: dex_mint_events.sender > wallets.address
+Ref: dex_mint_events.minter > wallets.address
+Ref: dex_mint_events.owner > wallets.address
+Ref: dex_burn_events.wallet > wallets.address
+Ref: dex_burn_events.from_address > wallets.address
+Ref: dex_burn_events.to_address > wallets.address
+Ref: dex_burn_events.target > wallets.address
+Ref: dex_burn_events.sender > wallets.address
